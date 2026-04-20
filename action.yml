@@ -1,4 +1,4 @@
-name: "Setono Sylius Plugin CI"
+name: "Sylius Plugin CI"
 description: "Run all PHP CI checks (coding standards, analysis, tests, coverage) sequentially in one job"
 author: "Setono"
 
