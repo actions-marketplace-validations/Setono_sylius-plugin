@@ -1,0 +1,51 @@
+name: "Coding standards"
+description: "Composer validation/normalization, code style, Rector dry-run, YAML and Twig linting"
+
+inputs:
+    php-version:
+        description: "PHP version (use the lowest supported version since higher versions can hide syntax errors)"
+        required: false
+        default: "8.2"
+    dependencies:
+        description: "Composer dependency versions: lowest or highest"
+        required: false
+        default: "highest"
+    extensions:
+        description: "PHP extensions to install"
+        required: false
+        default: "intl, mbstring"
+
+runs:
+    using: "composite"
+    steps:
+        -   uses: "actions/checkout@v6"
+
+        -   uses: "shivammathur/setup-php@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                extensions: "${{ inputs.extensions }}"
+                coverage: "none"
+
+        -   uses: "ramsey/composer-install@v4"
+            with:
+                dependency-versions: "${{ inputs.dependencies }}"
+
+        -   shell: "bash"
+            run: "composer validate --strict"
+
+        -   shell: "bash"
+            run: "composer normalize --dry-run"
+
+        -   shell: "bash"
+            run: "composer check-style"
+
+        -   shell: "bash"
+            run: "vendor/bin/rector process --dry-run"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            run: "bin/console lint:yaml ../../.github ../../config ../../translations"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            run: "bin/console lint:twig ../../templates"

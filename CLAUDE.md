@@ -24,6 +24,26 @@ When touching this extension: edits to `phpstan/extension.neon` use paths relati
 
 CI (`.github/workflows/build.yaml`) matrix-tests against PHP 8.2 / 8.3 / 8.4 and Symfony 6.4 / 7.4. Dependency version bumps must stay installable across that full matrix. The README's "use the tag that matches the Sylius version you want to use" convention means branch/tag bumps are the signal to consumers — keep that in mind when changing required versions.
 
+## Tags serve two consumers
+
+This repo is both a composer meta-package AND a set of GitHub composite actions (root `action.yml` plus seven sub-actions in subdirectories). Tags are dual-purpose:
+
+- **Composer consumers** depend on `^2.0` and pull in the dev tooling.
+- **Action consumers** pin `setono/sylius-plugin@v2` (or a sub-action like `setono/sylius-plugin/unit-tests@v2`).
+
+The root action references its own sub-actions via the floating major tag: `setono/sylius-plugin/coding-standards@v2` etc. This means **every release must force-push the floating major tag** alongside the exact tag, otherwise action consumers stay pinned to the previous patch.
+
+Note the asymmetry: exact tags are bare-numeric (`2.0.0`, `2.1.0` — composer-friendly, matches the historical convention) but the floating major tag uses the `v` prefix (`v2`) to match GitHub Actions ecosystem convention (consumers expect `@v1`, `@v2`, etc.).
+
+Release procedure:
+
+```shell
+git tag -a 2.x.y -m "Release 2.x.y" && git push origin 2.x.y
+git tag -fa v2 -m "Update floating v2 tag" && git push --force origin v2
+```
+
+**Never edit the sub-action references in `action.yml` on a routine release.** They pin the floating major specifically so patch releases don't require touching the file. Only edit them on a major bump.
+
 ## Common commands
 
 ```shell

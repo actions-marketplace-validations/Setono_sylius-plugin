@@ -1,0 +1,71 @@
+name: "Integration tests"
+description: "Validate Doctrine schema against a live MySQL instance from tests/Application"
+
+inputs:
+    php-version:
+        description: "PHP version to install"
+        required: true
+    dependencies:
+        description: "Composer dependency versions: lowest or highest"
+        required: true
+    symfony:
+        description: "Symfony version constraint for Flex (e.g. ~7.4.0). Empty string disables the constraint."
+        required: false
+        default: ""
+    extensions:
+        description: "PHP extensions to install"
+        required: false
+        default: "intl, mbstring"
+    database-url:
+        description: "Symfony DATABASE_URL for the test application"
+        required: false
+        default: "mysql://root:root@127.0.0.1/sylius?serverVersion=8.0"
+
+runs:
+    using: "composite"
+    steps:
+        -   shell: "bash"
+            run: "sudo /etc/init.d/mysql start"
+
+        -   uses: "actions/checkout@v6"
+
+        -   uses: "shivammathur/setup-php@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                extensions: "${{ inputs.extensions }}"
+                coverage: "none"
+                tools: "flex"
+
+        -   uses: "ramsey/composer-install@v4"
+            env:
+                SYMFONY_REQUIRE: "${{ inputs.symfony }}"
+            with:
+                dependency-versions: "${{ inputs.dependencies }}"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            env:
+                APP_ENV: "test"
+                DATABASE_URL: "${{ inputs.database-url }}"
+            run: "bin/console lint:container"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            env:
+                APP_ENV: "test"
+                DATABASE_URL: "${{ inputs.database-url }}"
+            run: "bin/console doctrine:database:create"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            env:
+                APP_ENV: "test"
+                DATABASE_URL: "${{ inputs.database-url }}"
+            run: "bin/console doctrine:schema:create"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            env:
+                APP_ENV: "test"
+                DATABASE_URL: "${{ inputs.database-url }}"
+            run: "bin/console doctrine:schema:validate -vvv"

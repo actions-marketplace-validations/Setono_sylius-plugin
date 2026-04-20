@@ -1,0 +1,42 @@
+name: "Dependency analysis"
+description: "Run composer-dependency-analyser against production dependencies"
+
+inputs:
+    php-version:
+        description: "PHP version to install"
+        required: true
+    dependencies:
+        description: "Composer dependency versions: lowest or highest"
+        required: true
+    symfony:
+        description: "Symfony version constraint for Flex (e.g. ~7.4.0). Empty string disables the constraint."
+        required: false
+        default: ""
+    extensions:
+        description: "PHP extensions to install"
+        required: false
+        default: "intl, mbstring"
+
+runs:
+    using: "composite"
+    steps:
+        -   uses: "actions/checkout@v6"
+
+        -   uses: "shivammathur/setup-php@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                extensions: "${{ inputs.extensions }}"
+                coverage: "none"
+                tools: "flex, composer-dependency-analyser"
+
+        -   shell: "bash"
+            run: "composer config --unset require-dev"
+
+        -   uses: "ramsey/composer-install@v4"
+            env:
+                SYMFONY_REQUIRE: "${{ inputs.symfony }}"
+            with:
+                dependency-versions: "${{ inputs.dependencies }}"
+
+        -   shell: "bash"
+            run: "composer-dependency-analyser"

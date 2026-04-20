@@ -1,0 +1,94 @@
+name: "Setono Sylius Plugin CI"
+description: "Run all PHP CI checks (coding standards, analysis, tests, coverage) sequentially in one job"
+author: "Setono"
+
+branding:
+    icon: "check-square"
+    color: "blue"
+
+inputs:
+    php-version:
+        description: "PHP version for most checks"
+        required: false
+        default: "8.3"
+    php-version-lowest:
+        description: "PHP version for coding-standards (should be the lowest supported version)"
+        required: false
+        default: "8.2"
+    dependencies:
+        description: "Composer dependency versions: lowest or highest"
+        required: false
+        default: "highest"
+    symfony:
+        description: "Symfony version constraint for Flex (e.g. ~7.4.0)"
+        required: false
+        default: "~7.4.0"
+    extensions:
+        description: "PHP extensions to install"
+        required: false
+        default: "intl, mbstring"
+    database-url:
+        description: "DATABASE_URL for the integration tests"
+        required: false
+        default: "mysql://root:root@127.0.0.1/sylius?serverVersion=8.0"
+    codecov-token:
+        description: "Codecov upload token. Leave empty to skip the code-coverage step."
+        required: false
+        default: ""
+    stryker-dashboard-api-key:
+        description: "Stryker Dashboard API key. Leave empty to skip dashboard reporting (Infection still runs)."
+        required: false
+        default: ""
+
+runs:
+    using: "composite"
+    steps:
+        -   uses: "setono/sylius-plugin/coding-standards@v2"
+            with:
+                php-version: "${{ inputs.php-version-lowest }}"
+                dependencies: "${{ inputs.dependencies }}"
+                extensions: "${{ inputs.extensions }}"
+
+        -   uses: "setono/sylius-plugin/dependency-analysis@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                dependencies: "${{ inputs.dependencies }}"
+                symfony: "${{ inputs.symfony }}"
+                extensions: "${{ inputs.extensions }}"
+
+        -   uses: "setono/sylius-plugin/static-code-analysis@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                dependencies: "${{ inputs.dependencies }}"
+                symfony: "${{ inputs.symfony }}"
+                extensions: "${{ inputs.extensions }}"
+
+        -   uses: "setono/sylius-plugin/unit-tests@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                dependencies: "${{ inputs.dependencies }}"
+                symfony: "${{ inputs.symfony }}"
+                extensions: "${{ inputs.extensions }}"
+
+        -   uses: "setono/sylius-plugin/integration-tests@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                dependencies: "${{ inputs.dependencies }}"
+                symfony: "${{ inputs.symfony }}"
+                extensions: "${{ inputs.extensions }}"
+                database-url: "${{ inputs.database-url }}"
+
+        -   uses: "setono/sylius-plugin/mutation-tests@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                dependencies: "${{ inputs.dependencies }}"
+                extensions: "${{ inputs.extensions }}"
+                stryker-dashboard-api-key: "${{ inputs.stryker-dashboard-api-key }}"
+
+        -   if: "inputs.codecov-token != ''"
+            uses: "setono/sylius-plugin/code-coverage@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                dependencies: "${{ inputs.dependencies }}"
+                extensions: "${{ inputs.extensions }}"
+                codecov-token: "${{ inputs.codecov-token }}"

@@ -1,0 +1,41 @@
+name: "Code coverage"
+description: "Run PHPUnit with pcov coverage and upload the report to Codecov"
+
+inputs:
+    php-version:
+        description: "PHP version to install"
+        required: false
+        default: "8.3"
+    dependencies:
+        description: "Composer dependency versions: lowest or highest"
+        required: false
+        default: "highest"
+    extensions:
+        description: "PHP extensions to install"
+        required: false
+        default: "intl, mbstring"
+    codecov-token:
+        description: "Codecov upload token. Pass via secrets."
+        required: true
+
+runs:
+    using: "composite"
+    steps:
+        -   uses: "actions/checkout@v6"
+
+        -   uses: "shivammathur/setup-php@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                extensions: "${{ inputs.extensions }}"
+                coverage: "pcov"
+
+        -   uses: "ramsey/composer-install@v4"
+            with:
+                dependency-versions: "${{ inputs.dependencies }}"
+
+        -   shell: "bash"
+            run: "vendor/bin/phpunit --coverage-clover=.build/logs/clover.xml"
+
+        -   uses: "codecov/codecov-action@v5"
+            with:
+                token: "${{ inputs.codecov-token }}"
