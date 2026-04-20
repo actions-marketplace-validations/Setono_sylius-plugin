@@ -123,7 +123,7 @@ The `code-coverage` sub-action SHALL install composer dependencies, run `vendor/
 
 ### Requirement: Backwards compatibility sub-action runs Roave's backward-compatibility-check against the PR base ref
 
-The `backwards-compatibility` sub-action SHALL check out the consumer's repo with `fetch-depth: 0`, install PHP, install `roave/backward-compatibility-check` via `composer global require`, then run `~/.composer/vendor/bin/roave-backward-compatibility-check --from=<from> --format=github-actions`. It SHALL accept inputs `php-version` (default `8.2`), `extensions` (default `intl, mbstring`), and `from` (default `origin/${{ github.event.pull_request.base.ref }}`).
+The `backwards-compatibility` sub-action SHALL check out the consumer's repo with `fetch-depth: 0`, install PHP, install `roave/backward-compatibility-check` via `composer global require`, then run `~/.composer/vendor/bin/roave-backward-compatibility-check --from=<from> --format=github-actions`. It SHALL accept inputs `php-version` (default `8.2`) and `from` (default `origin/${{ github.event.pull_request.base.ref }}`). The action does not install custom PHP extensions because Roave's tool inspects source files and needs nothing beyond a standard PHP build.
 
 The sub-action itself does not gate on event type. The root action MUST gate its invocation of `backwards-compatibility` with `if: github.event_name == 'pull_request'`, so the root remains safe to consume from any workflow. Standalone consumers SHALL scope their workflow to `on: pull_request` or pass an explicit `from` ref.
 

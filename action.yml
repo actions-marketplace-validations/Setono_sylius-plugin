@@ -97,4 +97,3 @@ runs:
             uses: "setono/sylius-plugin/backwards-compatibility@v2"
             with:
                 php-version: "${{ inputs.php-version }}"
-                extensions: "${{ inputs.extensions }}"

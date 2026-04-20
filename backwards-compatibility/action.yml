@@ -6,10 +6,6 @@ inputs:
         description: "PHP version to install"
         required: false
         default: "8.2"
-    extensions:
-        description: "PHP extensions to install"
-        required: false
-        default: "intl, mbstring"
     from:
         description: "Git ref to compare against. The default works only in pull_request triggers; pass an explicit ref otherwise."
         required: false
@@ -25,7 +21,6 @@ runs:
         -   uses: "shivammathur/setup-php@v2"
             with:
                 php-version: "${{ inputs.php-version }}"
-                extensions: "${{ inputs.extensions }}"
                 coverage: "none"
 
         -   shell: "bash"

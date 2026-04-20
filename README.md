@@ -220,7 +220,6 @@ Wraps [Roave's `backward-compatibility-check`](https://github.com/Roave/Backward
 | Input | Default | Description |
 |---|---|---|
 | `php-version` | `8.2` | PHP version to install |
-| `extensions` | `intl, mbstring` | PHP extensions to install |
 | `from` | `origin/${{ github.event.pull_request.base.ref }}` | Git ref to compare against. The default only resolves on `pull_request` triggers — pass an explicit ref for other triggers |
 
 The root action invokes this sub-action only on `pull_request` triggers (gated via `if:`), so it's safe to consume the root from any workflow. When invoking this sub-action standalone, scope the workflow to `on: pull_request` (or pass an explicit `from` ref).
