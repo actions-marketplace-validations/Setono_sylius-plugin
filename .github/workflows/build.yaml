@@ -8,7 +8,7 @@ on:
 
 jobs:
     checks:
-        name: "PHP ${{ matrix.php }} | SF ${{ matrix.symfony }}"
+        name: "PHP ${{ matrix.php }} | SF ${{ matrix.symfony }} | Sylius ${{ matrix.sylius }}"
 
         runs-on: "ubuntu-latest"
 
@@ -24,6 +24,11 @@ jobs:
                     - "~6.4.0"
                     - "~7.4.0"
 
+                sylius:
+                    - "~2.0.0"
+                    - "~2.1.0"
+                    - "~2.2.0"
+
         steps:
             -   name: "Checkout"
                 uses: "actions/checkout@v6"
@@ -34,6 +39,9 @@ jobs:
                     php-version: "${{ matrix.php }}"
                     coverage: "none"
                     tools: "flex"
+
+            -   name: "Require Sylius version"
+                run: "composer require --dev --no-update sylius/sylius:${{ matrix.sylius }}"
 
             -   name: "Install composer dependencies"
                 uses: "ramsey/composer-install@v4"
