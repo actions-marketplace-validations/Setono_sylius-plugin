@@ -21,15 +21,18 @@
         "shipmonk/composer-dependency-analyser": "^1.8.4",
         "sylius-labs/coding-standard": "^4.5"
     },
+    "require-dev": {
+        "sylius/sylius": "^2.0"
+    },
     "config": {
-        "sort-packages": true,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "ergebnis/composer-normalize": true,
             "infection/extension-installer": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true
-        }
+        },
+        "sort-packages": true
     },
     "extra": {
         "phpstan": {
@@ -37,8 +40,5 @@
                 "phpstan/extension.neon"
             ]
         }
-    },
-    "require-dev": {
-        "sylius/sylius": "^2.0"
     }
 }
