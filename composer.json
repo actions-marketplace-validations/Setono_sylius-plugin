@@ -1,6 +1,6 @@
 {
     "name": "setono/sylius-plugin",
-    "description": "A library for aiding in your Sylius plugin development",
+    "description": "Development dependency pack that bundles the tooling (PHPStan, PHPUnit, Rector, coding standard, …) used to build Sylius plugins. Install with composer require --dev.",
     "license": "MIT",
     "type": "library",
     "require": {

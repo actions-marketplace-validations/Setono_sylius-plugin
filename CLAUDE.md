@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-`setono/sylius-plugin` is a Composer **meta-package** (the README calls it "Sylius plugin pack") that bundles the dev-tooling stack used across Setono's Sylius plugins. It has no runtime source code (no `src/`, no `tests/`) — consumers install it with `composer require --dev` and inherit a curated set of linters, static analyzers, and test tooling.
+`setono/sylius-plugin` is a Composer **meta-package** intended to be installed as a dev-only dependency (`composer require --dev setono/sylius-plugin`) inside Sylius plugins. Its sole purpose is to bundle the curated tooling stack Setono uses to develop Sylius plugins, so each plugin inherits the same linters, static analyzers, and test tooling without pinning them individually.
+
+It has no runtime source code — no `src/`, no `tests/`. The `require-dev` entry on `sylius/sylius` exists only so the bundled PHPStan stubs resolve against a real Sylius codebase during local development of this package.
 
 Everything shipped by this package is either:
 - A pinned `require` entry in `composer.json` (PHPStan + its extensions, PHPUnit, Rector, Infection, Sylius Labs coding standard, composer-normalize, dependency-analyser, etc.), or
