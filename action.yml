@@ -92,3 +92,9 @@ runs:
                 dependencies: "${{ inputs.dependencies }}"
                 extensions: "${{ inputs.extensions }}"
                 codecov-token: "${{ inputs.codecov-token }}"
+
+        -   if: "github.event_name == 'pull_request'"
+            uses: "setono/sylius-plugin/backwards-compatibility@v2"
+            with:
+                php-version: "${{ inputs.php-version }}"
+                extensions: "${{ inputs.extensions }}"

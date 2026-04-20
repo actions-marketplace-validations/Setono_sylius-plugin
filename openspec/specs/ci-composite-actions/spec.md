@@ -3,11 +3,11 @@
 ## Purpose
 TBD - created by archiving change add-ci-composite-actions. Update Purpose after archive.
 ## Requirements
-### Requirement: Repository ships seven independently invokable composite GitHub Actions
+### Requirement: Repository ships eight independently invokable composite GitHub Actions
 
-The repository SHALL provide seven composite GitHub Actions, each in its own subdirectory at the repo root with an `action.yml` file. Each sub-action MUST be invokable in a consumer workflow as `setono/sylius-plugin/<sub-action-name>@<ref>` and MUST be self-contained (it MUST NOT depend on any other sub-action in this repo).
+The repository SHALL provide eight composite GitHub Actions, each in its own subdirectory at the repo root with an `action.yml` file. Each sub-action MUST be invokable in a consumer workflow as `setono/sylius-plugin/<sub-action-name>@<ref>` and MUST be self-contained (it MUST NOT depend on any other sub-action in this repo).
 
-The seven sub-actions are:
+The eight sub-actions are:
 - `coding-standards`
 - `dependency-analysis`
 - `static-code-analysis`
@@ -15,6 +15,7 @@ The seven sub-actions are:
 - `integration-tests`
 - `mutation-tests`
 - `code-coverage`
+- `backwards-compatibility`
 
 #### Scenario: Consumer invokes a single sub-action
 
@@ -120,6 +121,27 @@ The `code-coverage` sub-action SHALL install composer dependencies, run `vendor/
 - **WHEN** the action is invoked with a valid `codecov-token`
 - **THEN** clover coverage is generated and uploaded to Codecov successfully
 
+### Requirement: Backwards compatibility sub-action runs Roave's backward-compatibility-check against the PR base ref
+
+The `backwards-compatibility` sub-action SHALL check out the consumer's repo with `fetch-depth: 0`, install PHP, install `roave/backward-compatibility-check` via `composer global require`, then run `~/.composer/vendor/bin/roave-backward-compatibility-check --from=<from> --format=github-actions`. It SHALL accept inputs `php-version` (default `8.2`), `extensions` (default `intl, mbstring`), and `from` (default `origin/${{ github.event.pull_request.base.ref }}`).
+
+The sub-action itself does not gate on event type. The root action MUST gate its invocation of `backwards-compatibility` with `if: github.event_name == 'pull_request'`, so the root remains safe to consume from any workflow. Standalone consumers SHALL scope their workflow to `on: pull_request` or pass an explicit `from` ref.
+
+#### Scenario: PR-triggered invocation against the base ref
+
+- **WHEN** the action is invoked from a `pull_request`-triggered workflow with no `from` input
+- **THEN** the BC check runs against `origin/<base-ref>` and any public-API regression is reported as a GitHub Actions inline annotation on the offending source line
+
+#### Scenario: Consumer overrides the comparison ref
+
+- **WHEN** the action is invoked with an explicit `from` input (e.g., `from: 'origin/main'`)
+- **THEN** the BC check runs against the provided ref instead of the PR base ref, allowing the action to work outside `pull_request` triggers
+
+#### Scenario: Root action skips backwards-compatibility on non-PR triggers
+
+- **WHEN** the root action is invoked from a non-`pull_request` trigger
+- **THEN** the root's `if: github.event_name == 'pull_request'` guard skips the backwards-compatibility step entirely, so non-PR runs of the root succeed regardless of the BC sub-action's PR requirement
+
 ### Requirement: All actions follow GitHub composite-action constraints
 
 Every `run:` step in every action SHALL declare `shell: bash`. No action SHALL declare a top-level `env:` block (composite actions don't support it). Environment variables that need to span multiple steps SHALL be set per-step via `env:` on each `run:` step that needs them.
@@ -140,7 +162,7 @@ Action releases SHALL reuse the repository's existing tag scheme (e.g., `2.0.0`,
 
 ### Requirement: README documents every sub-action and its inputs
 
-`README.md` SHALL contain a section documenting each of the seven sub-actions and the root action: action reference path, all inputs (with defaults and descriptions), and at least one consumer usage example. Per the project's existing rule, no new feature is considered complete until the README reflects it.
+`README.md` SHALL contain a section documenting each of the eight sub-actions and the root action: action reference path, all inputs (with defaults and descriptions), and at least one consumer usage example. Per the project's existing rule, no new feature is considered complete until the README reflects it.
 
 #### Scenario: Consumer reads README to learn how to invoke the actions
 

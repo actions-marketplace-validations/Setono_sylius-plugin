@@ -14,11 +14,11 @@ composer require --dev setono/sylius-plugin
 
 This repository also ships a suite of composite GitHub Actions that implement the Setono Sylius plugin CI pipeline. Each check is its own sub-action, addressable as `setono/sylius-plugin/<name>@<ref>`, so consumers can run each in its own job with its own matrix. There is also a root action `setono/sylius-plugin@<ref>` listed on the GitHub Marketplace that runs all checks sequentially in one job — handy for trying it out, slow for real CI.
 
-Eight actions ship in this repository:
+Nine actions ship in this repository:
 
 | Action | Purpose |
 |---|---|
-| `setono/sylius-plugin@<ref>` | Root action. Runs all seven checks sequentially in one job |
+| `setono/sylius-plugin@<ref>` | Root action. Runs all eight checks sequentially in one job |
 | `setono/sylius-plugin/coding-standards@<ref>` | composer validate, normalize, check-style, rector dry-run, yaml/twig lint |
 | `setono/sylius-plugin/dependency-analysis@<ref>` | composer-dependency-analyser against production deps |
 | `setono/sylius-plugin/static-code-analysis@<ref>` | `vendor/bin/phpstan analyse`, with `sylius/sylius` removed first |
@@ -26,6 +26,7 @@ Eight actions ship in this repository:
 | `setono/sylius-plugin/integration-tests@<ref>` | MySQL + Doctrine schema validation against `tests/Application` |
 | `setono/sylius-plugin/mutation-tests@<ref>` | Infection, with optional Stryker Dashboard reporting |
 | `setono/sylius-plugin/code-coverage@<ref>` | PHPUnit with pcov, upload to Codecov |
+| `setono/sylius-plugin/backwards-compatibility@<ref>` | Roave backward-compatibility-check against the PR base ref |
 
 Pin the floating major (`@v2`) for automatic patch updates, or pin a specific tag (`@2.1.0`) for full reproducibility. Note the asymmetry: exact tags are bare-numeric (composer convention), the floating major uses the `v` prefix (action ecosystem convention).
 
@@ -210,6 +211,31 @@ jobs:
             -   uses: "setono/sylius-plugin/code-coverage@v2"
                 with:
                     codecov-token: "${{ secrets.CODECOV_TOKEN }}"
+```
+
+#### `backwards-compatibility`
+
+Wraps [Roave's `backward-compatibility-check`](https://github.com/Roave/BackwardCompatibilityCheck). Compares the PR's diff against its base ref and fails on any public-API break. Inline annotations show up directly on the changed lines via `--format=github-actions`.
+
+| Input | Default | Description |
+|---|---|---|
+| `php-version` | `8.2` | PHP version to install |
+| `extensions` | `intl, mbstring` | PHP extensions to install |
+| `from` | `origin/${{ github.event.pull_request.base.ref }}` | Git ref to compare against. The default only resolves on `pull_request` triggers — pass an explicit ref for other triggers |
+
+The root action invokes this sub-action only on `pull_request` triggers (gated via `if:`), so it's safe to consume the root from any workflow. When invoking this sub-action standalone, scope the workflow to `on: pull_request` (or pass an explicit `from` ref).
+
+```yaml
+name: "Backwards compatibility"
+
+on:
+    pull_request: ~
+
+jobs:
+    backwards-compatibility:
+        runs-on: "ubuntu-latest"
+        steps:
+            -   uses: "setono/sylius-plugin/backwards-compatibility@v2"
 ```
 
 ### Root action
