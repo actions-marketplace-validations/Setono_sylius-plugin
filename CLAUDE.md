@@ -34,3 +34,7 @@ composer update                # refresh composer.lock after dependency changes
 ```
 
 There is no test suite, no lint target, and no PHPStan run in this repo — those tools exist here only to be re-exported to consumers.
+
+## Documenting features
+
+Every time a feature is added to this library, it MUST be documented in `README.md`. Consumers discover what this package ships via the README, so any new PHPStan stub, bundled tool, or behavior change is not considered complete until the README reflects it.
