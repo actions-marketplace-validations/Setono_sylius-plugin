@@ -21,8 +21,8 @@ Eight actions ship in this repository:
 | `setono/sylius-plugin@<ref>` | Root action. Runs all seven checks sequentially in one job |
 | `setono/sylius-plugin/coding-standards@<ref>` | composer validate, normalize, check-style, rector dry-run, yaml/twig lint |
 | `setono/sylius-plugin/dependency-analysis@<ref>` | composer-dependency-analyser against production deps |
-| `setono/sylius-plugin/static-code-analysis@<ref>` | composer analyse (PHPStan/Psalm), with `sylius/sylius` removed first |
-| `setono/sylius-plugin/unit-tests@<ref>` | composer phpunit |
+| `setono/sylius-plugin/static-code-analysis@<ref>` | `vendor/bin/phpstan analyse`, with `sylius/sylius` removed first |
+| `setono/sylius-plugin/unit-tests@<ref>` | `vendor/bin/phpunit` |
 | `setono/sylius-plugin/integration-tests@<ref>` | MySQL + Doctrine schema validation against `tests/Application` |
 | `setono/sylius-plugin/mutation-tests@<ref>` | Infection, with optional Stryker Dashboard reporting |
 | `setono/sylius-plugin/code-coverage@<ref>` | PHPUnit with pcov, upload to Codecov |
@@ -34,8 +34,7 @@ Pin the floating major (`@v2`) for automatic patch updates, or pin a specific ta
 The actions assume your plugin follows the standard Setono Sylius plugin scaffold. Specifically:
 
 - A test application at `tests/Application/` with `bin/console` available
-- Composer scripts named `check-style`, `analyse`, and `phpunit`
-- Production source organized under a path that PHPStan/Psalm can analyse via `composer analyse`
+- Config files at the repo root: `ecs.php` (Easy Coding Standard), `phpstan.neon` / `phpstan.neon.dist` (PHPStan), and `phpunit.xml` / `phpunit.xml.dist` (PHPUnit)
 - For integration tests: `tests/Application/` runs in a Symfony `test` env and uses Doctrine with a MySQL-backed connection
 - For mutation tests: Infection is configured (typically via `infection.json5`)
 - For code coverage: PHPUnit is configured to write a clover report to `.build/logs/clover.xml`
@@ -64,8 +63,8 @@ jobs:
 
 | Input | Default | Description |
 |---|---|---|
-| `php-version` | _(required)_ | PHP version to install |
-| `dependencies` | _(required)_ | Composer dependency versions: `lowest` or `highest` |
+| `php-version` | `8.2` | PHP version to install |
+| `dependencies` | `highest` | Composer dependency versions: `lowest` or `highest` |
 | `symfony` | `""` | Symfony version constraint for Flex (e.g. `~7.4.0`). Empty disables the constraint |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
 
@@ -93,8 +92,8 @@ jobs:
 
 | Input | Default | Description |
 |---|---|---|
-| `php-version` | _(required)_ | PHP version to install |
-| `dependencies` | _(required)_ | Composer dependency versions: `lowest` or `highest` |
+| `php-version` | `8.2` | PHP version to install |
+| `dependencies` | `highest` | Composer dependency versions: `lowest` or `highest` |
 | `symfony` | `""` | Symfony version constraint for Flex |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
 
@@ -122,8 +121,8 @@ jobs:
 
 | Input | Default | Description |
 |---|---|---|
-| `php-version` | _(required)_ | PHP version to install |
-| `dependencies` | _(required)_ | Composer dependency versions: `lowest` or `highest` |
+| `php-version` | `8.2` | PHP version to install |
+| `dependencies` | `highest` | Composer dependency versions: `lowest` or `highest` |
 | `symfony` | `""` | Symfony version constraint for Flex |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
 
@@ -149,8 +148,8 @@ jobs:
 
 | Input | Default | Description |
 |---|---|---|
-| `php-version` | _(required)_ | PHP version to install |
-| `dependencies` | _(required)_ | Composer dependency versions: `lowest` or `highest` |
+| `php-version` | `8.2` | PHP version to install |
+| `dependencies` | `highest` | Composer dependency versions: `lowest` or `highest` |
 | `symfony` | `""` | Symfony version constraint for Flex |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
 | `database-url` | `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0` | Symfony `DATABASE_URL` for the test application |

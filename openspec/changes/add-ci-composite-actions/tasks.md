@@ -2,8 +2,8 @@
 
 - [x] 1.1 Create `coding-standards/action.yml` with inline setup, six checks (composer validate, normalize, check-style, rector dry-run, yaml lint, twig lint), and inputs `php-version` (default `8.2`), `dependencies` (default `highest`), `extensions` (default `intl, mbstring`)
 - [x] 1.2 Create `dependency-analysis/action.yml` with inline setup including `composer-dependency-analyser` in tools, an `unset require-dev` step before install, and inputs `php-version`, `dependencies`, `symfony`, `extensions`
-- [x] 1.3 Create `static-code-analysis/action.yml` with inline setup, a `composer remove sylius/sylius` step before install, a `composer analyse` step, and inputs `php-version`, `dependencies`, `symfony`, `extensions`
-- [x] 1.4 Create `unit-tests/action.yml` with inline setup, a `composer phpunit` step, and inputs `php-version`, `dependencies`, `symfony`, `extensions`
+- [x] 1.3 Create `static-code-analysis/action.yml` with inline setup, a `composer remove sylius/sylius` step before install, a `vendor/bin/phpstan analyse` step, and inputs `php-version`, `dependencies`, `symfony`, `extensions`
+- [x] 1.4 Create `unit-tests/action.yml` with inline setup, a `vendor/bin/phpunit` step, and inputs `php-version`, `dependencies`, `symfony`, `extensions`
 - [x] 1.5 Create `integration-tests/action.yml` with `sudo /etc/init.d/mysql start` first, inline setup, four Doctrine commands from `tests/Application` with `APP_ENV=test` and `DATABASE_URL` per step, and inputs `php-version`, `dependencies`, `symfony`, `extensions`, `database-url` (default `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0`)
 - [x] 1.6 Create `mutation-tests/action.yml` with inline setup using `coverage: pcov` and `tools: infection`, an `infection` step that exposes `STRYKER_DASHBOARD_API_KEY`, and inputs `php-version` (default `8.3`), `dependencies` (default `highest`), `extensions`, `stryker-dashboard-api-key` (default empty)
 - [x] 1.7 Create `code-coverage/action.yml` with inline setup using `coverage: pcov`, a phpunit step writing `.build/logs/clover.xml`, a `codecov/codecov-action@v5` upload step, and inputs `php-version` (default `8.3`), `dependencies` (default `highest`), `extensions`, `codecov-token` (required)
@@ -28,8 +28,8 @@
 ## 4. First release bootstrap
 
 - [x] 4.1 Find/replace every `setono/sylius-plugin/<sub-action>@main` reference inside the root action.yml to `setono/sylius-plugin/<sub-action>@v2`
-- [ ] 4.2 Tag the release `2.x.y` (next release in the existing tag sequence) and push the tag
-- [ ] 4.3 Force-push the floating major tag: `git tag -fa v2 -m "Update floating v2 tag" && git push --force origin v2`
+- [x] 4.2 Tag the release `2.x.y` (next release in the existing tag sequence) and push the tag
+- [x] 4.3 Force-push the floating major tag: `git tag -fa v2 -m "Update floating v2 tag" && git push --force origin v2`
 - [ ] 4.4 In GitHub's release UI for `2.x.y`, tick "Publish to Marketplace", pick a primary and secondary category
 - [ ] 4.5 After the release is live, manually verify the Marketplace listing page loads and shows the root action's branding/description correctly
 

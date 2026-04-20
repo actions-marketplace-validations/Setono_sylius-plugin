@@ -4,10 +4,12 @@ description: "Run composer-dependency-analyser against production dependencies"
 inputs:
     php-version:
         description: "PHP version to install"
-        required: true
+        required: false
+        default: "8.2"
     dependencies:
         description: "Composer dependency versions: lowest or highest"
-        required: true
+        required: false
+        default: "highest"
     symfony:
         description: "Symfony version constraint for Flex (e.g. ~7.4.0). Empty string disables the constraint."
         required: false

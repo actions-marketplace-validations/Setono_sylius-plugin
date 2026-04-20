@@ -85,7 +85,7 @@ Self-references inside the root action (`setono/sylius-plugin/coding-standards@v
 
 ### Decision 6: No self-test workflow
 
-**Why**: This repo has no plugin source, no `tests/Application/`, no `composer phpunit` script — nothing for the actions to chew on. A meaningful self-test would require building a fixture plugin, which is significant new code for one purpose.
+**Why**: This repo has no plugin source, no `tests/Application/`, no `phpunit.xml(.dist)` — nothing for the actions to chew on. A meaningful self-test would require building a fixture plugin, which is significant new code for one purpose.
 
 **Alternatives considered**:
 - *Fixture plugin under `tests/fixture/`* — real correctness signal, but ongoing maintenance.

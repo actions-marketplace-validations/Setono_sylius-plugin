@@ -9,8 +9,8 @@ GitHub Marketplace does not accept reusable workflows — only actions. Composit
 - Add seven composite GitHub Actions to the repository, each in its own subdirectory with an `action.yml`:
   - `coding-standards/` — composer validate/normalize, check-style, rector dry-run, yaml/twig lint
   - `dependency-analysis/` — composer-dependency-analyser against production deps
-  - `static-code-analysis/` — composer analyse (psalm/phpstan), with `sylius/sylius` removed first
-  - `unit-tests/` — composer phpunit
+  - `static-code-analysis/` — `vendor/bin/phpstan analyse`, with `sylius/sylius` removed first
+  - `unit-tests/` — `vendor/bin/phpunit`
   - `integration-tests/` — MySQL + doctrine schema validation against tests/Application
   - `mutation-tests/` — infection with optional Stryker Dashboard reporting
   - `code-coverage/` — phpunit with pcov, upload to Codecov

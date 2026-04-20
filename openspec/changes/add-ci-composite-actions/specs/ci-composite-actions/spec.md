@@ -39,7 +39,7 @@ The repository SHALL provide a root `action.yml` at the repository root. The roo
 
 ### Requirement: Coding standards sub-action runs composer validation, normalization, style, rector, and template linting
 
-The `coding-standards` sub-action SHALL run, in order: `composer validate --strict`, `composer normalize --dry-run`, `composer check-style`, `vendor/bin/rector process --dry-run`, `bin/console lint:yaml ../../.github ../../config ../../translations` (from `tests/Application`), and `bin/console lint:twig ../../templates` (from `tests/Application`). It SHALL accept inputs `php-version` (default the lowest supported), `dependencies` (default `highest`), and `extensions` (default `intl, mbstring`).
+The `coding-standards` sub-action SHALL run, in order: `composer validate --strict`, `composer normalize --dry-run`, `vendor/bin/ecs check`, `vendor/bin/rector process --dry-run`, `bin/console lint:yaml ../../.github ../../config ../../translations` (from `tests/Application`), and `bin/console lint:twig ../../templates` (from `tests/Application`). It SHALL accept inputs `php-version` (default the lowest supported), `dependencies` (default `highest`), and `extensions` (default `intl, mbstring`).
 
 #### Scenario: Default invocation against the standard plugin scaffold
 
@@ -60,25 +60,25 @@ The `dependency-analysis` sub-action SHALL unset the consumer's `require-dev` bl
 - **WHEN** the action is invoked
 - **THEN** `composer config --unset require-dev` runs before `composer install`, so the analyser cannot mistake dev-only packages for production usage
 
-### Requirement: Static code analysis sub-action removes sylius/sylius before running composer analyse
+### Requirement: Static code analysis sub-action removes sylius/sylius before running PHPStan
 
-The `static-code-analysis` sub-action SHALL run `composer remove --dev --no-install --no-update --no-plugins --no-scripts sylius/sylius` before installing composer dependencies, then run `composer analyse`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, and `extensions`.
+The `static-code-analysis` sub-action SHALL run `composer remove --dev --no-install --no-update --no-plugins --no-scripts sylius/sylius` before installing composer dependencies, then run `vendor/bin/phpstan analyse`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, and `extensions`.
 
 The Sylius removal step exists because Sylius's source code triggers analyser errors that pollute plugin-level analysis output.
 
 #### Scenario: Analyser runs without Sylius source in the autoloader
 
 - **WHEN** the action is invoked
-- **THEN** `sylius/sylius` is removed from `composer.json` before `composer install`, and `composer analyse` runs against the remaining dependencies plus the consumer's plugin code
+- **THEN** `sylius/sylius` is removed from `composer.json` before `composer install`, and `vendor/bin/phpstan analyse` runs against the remaining dependencies plus the consumer's plugin code
 
-### Requirement: Unit tests sub-action runs composer phpunit
+### Requirement: Unit tests sub-action runs PHPUnit
 
-The `unit-tests` sub-action SHALL install composer dependencies, then run `composer phpunit`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, and `extensions`.
+The `unit-tests` sub-action SHALL install composer dependencies, then run `vendor/bin/phpunit`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, and `extensions`.
 
-#### Scenario: Action runs the consumer's phpunit composer script
+#### Scenario: Action runs PHPUnit against installed dependencies
 
 - **WHEN** the action is invoked
-- **THEN** `composer phpunit` runs against the consumer's installed dependencies
+- **THEN** `vendor/bin/phpunit` runs using the consumer's `phpunit.xml` (or `phpunit.xml.dist`) configuration
 
 ### Requirement: Integration tests sub-action validates Doctrine schema against a live MySQL instance
 

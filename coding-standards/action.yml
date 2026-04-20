@@ -37,7 +37,7 @@ runs:
             run: "composer normalize --dry-run"
 
         -   shell: "bash"
-            run: "composer check-style"
+            run: "vendor/bin/ecs check"
 
         -   shell: "bash"
             run: "vendor/bin/rector process --dry-run"
