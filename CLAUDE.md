@@ -35,12 +35,7 @@ The root action references its own sub-actions via the floating major tag: `seto
 
 Note the asymmetry: exact tags are bare-numeric (`2.0.0`, `2.1.0` — composer-friendly, matches the historical convention) but the floating major tag uses the `v` prefix (`v2`) to match GitHub Actions ecosystem convention (consumers expect `@v1`, `@v2`, etc.).
 
-Release procedure:
-
-```shell
-git tag -a 2.x.y -m "Release 2.x.y" && git push origin 2.x.y
-git tag -fa v2 -m "Update floating v2 tag" && git push --force origin v2
-```
+Use `bin/release <version>` to cut a release — it enforces the dual-tag invariant (validates the working tree, checks `action.yml` references match the major, then tags + force-pushes both). Never run the underlying tag/push commands by hand unless the script is broken; the whole point is to keep the two consumers in sync without remembering it.
 
 **Never edit the sub-action references in `action.yml` on a routine release.** They pin the floating major specifically so patch releases don't require touching the file. Only edit them on a major bump.
 

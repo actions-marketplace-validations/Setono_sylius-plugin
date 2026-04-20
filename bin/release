@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+#
+# Cut a release of setono/sylius-plugin.
+#
+# Composer consumers see the bare-numeric tag (e.g. 2.3.0); GitHub Actions
+# consumers pin the floating major (e.g. v2). Every release must push BOTH
+# tags atomically so the two stay in sync — that's what this script enforces.
+#
+# Usage:   bin/release <version> [-m "<message>"]
+# Example: bin/release 2.3.0
+#
+set -euo pipefail
+
+usage() {
+    cat >&2 <<USAGE
+Usage: $0 <version> [-m "<message>"]
+Example: $0 2.3.0
+USAGE
+    exit 64
+}
+
+[[ $# -lt 1 ]] && usage
+
+VERSION="$1"
+shift
+
+if [[ ! "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-[0-9A-Za-z.-]+)?$ ]]; then
+    echo "ERROR: version '$VERSION' does not match MAJOR.MINOR.PATCH(-prerelease)" >&2
+    exit 64
+fi
+MAJOR="${BASH_REMATCH[1]}"
+FLOATING="v${MAJOR}"
+
+MESSAGE="Release ${VERSION}"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -m)
+            [[ $# -lt 2 ]] && usage
+            MESSAGE="$2"
+            shift 2
+            ;;
+        *)
+            echo "ERROR: unknown argument '$1'" >&2
+            usage
+            ;;
+    esac
+done
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "${REPO_ROOT}"
+
+if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "ERROR: working tree is not clean. Commit or stash changes first." >&2
+    exit 1
+fi
+
+if git rev-parse --verify --quiet "refs/tags/${VERSION}" >/dev/null; then
+    echo "ERROR: tag '${VERSION}' already exists locally." >&2
+    exit 1
+fi
+
+if ! grep -q "setono/sylius-plugin/.*@${FLOATING}" action.yml; then
+    echo "ERROR: action.yml does not reference @${FLOATING}." >&2
+    echo "       Sub-action references in the root action.yml must be flipped to" >&2
+    echo "       @${FLOATING} before tagging release ${VERSION}." >&2
+    exit 1
+fi
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+git fetch --quiet origin "${CURRENT_BRANCH}" --tags
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse "origin/${CURRENT_BRANCH}")
+if [[ "${LOCAL}" != "${REMOTE}" ]]; then
+    echo "ERROR: local ${CURRENT_BRANCH} (${LOCAL:0:7}) differs from origin/${CURRENT_BRANCH} (${REMOTE:0:7})." >&2
+    echo "       Push or pull first so the release tag points at the right commit." >&2
+    exit 1
+fi
+
+cat <<INFO
+Releasing ${VERSION} from branch ${CURRENT_BRANCH}
+  Exact tag:      ${VERSION}
+  Floating major: ${FLOATING}  (force-pushed)
+  Tag message:    ${MESSAGE}
+
+INFO
+
+read -r -p "Proceed? [y/N] " confirm
+if [[ "${confirm}" != "y" && "${confirm}" != "Y" ]]; then
+    echo "Aborted."
+    exit 1
+fi
+
+git tag -a "${VERSION}" -m "${MESSAGE}"
+git push origin "${VERSION}"
+
+git tag -fa "${FLOATING}" -m "Update floating ${FLOATING} tag to ${VERSION}"
+git push --force origin "${FLOATING}"
+
+cat <<NEXT
+
+Released ${VERSION}. The floating ${FLOATING} tag now points at the same commit.
+
+Next step (manual): open the GitHub release UI for ${VERSION}, tick
+"Publish to Marketplace", and pick a primary and secondary category.
+NEXT

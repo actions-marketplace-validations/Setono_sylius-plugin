@@ -241,17 +241,23 @@ jobs:
 
 ### Releasing
 
-Exact tags are bare-numeric (`2.0.0`, `2.1.0`) for composer compatibility. The floating major tag uses the `v` prefix (`v2`) to match GitHub Actions ecosystem convention. After cutting a release, push both:
+Exact tags are bare-numeric (`2.0.0`, `2.1.0`) for composer compatibility. The floating major tag uses the `v` prefix (`v2`) to match GitHub Actions ecosystem convention. Both must be pushed atomically on every release so composer and action consumers stay in sync.
+
+Run the release script:
 
 ```shell
-git tag -a 2.x.y -m "Release 2.x.y"
-git push origin 2.x.y
-
-# Force-push the floating major tag so action consumers pinned to @v2 follow patches
-git tag -fa v2 -m "Update floating v2 tag to 2.x.y"
-git push --force origin v2
+bin/release 2.x.y
 ```
 
-Then, in GitHub's release UI for `2.x.y`, tick "Publish to Marketplace" and pick a primary and secondary category.
+The script validates the working tree, confirms `action.yml` references match the major being released, fetches origin, prompts for confirmation, then tags `2.x.y` and force-pushes the floating `v2` tag.
+
+After the script completes, open the GitHub release UI for `2.x.y`, tick "Publish to Marketplace", and pick a primary and secondary category.
 
 The root action's sub-action references (`setono/sylius-plugin/<name>@v2`) pin the floating major, so patch releases don't require editing `action.yml`. Only force-push the `v2` tag — never edit the root action's references on each release.
+
+Equivalent manual commands (what `bin/release` runs):
+
+```shell
+git tag -a 2.x.y -m "Release 2.x.y" && git push origin 2.x.y
+git tag -fa v2 -m "Update floating v2 tag to 2.x.y" && git push --force origin v2
+```
