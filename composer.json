@@ -1,0 +1,44 @@
+{
+    "name": "setono/sylius-plugin",
+    "description": "A library for aiding in your Sylius plugin development",
+    "license": "MIT",
+    "type": "library",
+    "require": {
+        "php": ">=8.2",
+        "ergebnis/composer-normalize": "^2.50",
+        "infection/infection": "~0.31.9",
+        "jangregor/phpstan-prophecy": "^2.3",
+        "matthiasnoback/symfony-dependency-injection-test": "^6.3",
+        "phpspec/prophecy-phpunit": "^2.5",
+        "phpstan/extension-installer": "^1.4.3",
+        "phpstan/phpstan": "^2.1.46",
+        "phpstan/phpstan-doctrine": "^2.0.20",
+        "phpstan/phpstan-phpunit": "^2.0.16",
+        "phpstan/phpstan-strict-rules": "^2.0.10",
+        "phpstan/phpstan-symfony": "^2.0.15",
+        "phpunit/phpunit": "^11.5.55",
+        "rector/rector": "^2.4.1",
+        "shipmonk/composer-dependency-analyser": "^1.8.4",
+        "sylius-labs/coding-standard": "^4.5"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "ergebnis/composer-normalize": true,
+            "infection/extension-installer": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "phpstan": {
+            "includes": [
+                "phpstan/extension.neon"
+            ]
+        }
+    },
+    "require-dev": {
+        "sylius/sylius": "^2.0"
+    }
+}

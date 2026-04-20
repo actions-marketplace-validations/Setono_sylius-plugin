@@ -1,0 +1,47 @@
+name: "build"
+on:
+    push: ~
+
+    pull_request: ~
+
+    workflow_dispatch: ~
+
+jobs:
+    checks:
+        name: "PHP ${{ matrix.php }} | SF ${{ matrix.symfony }}"
+
+        runs-on: "ubuntu-latest"
+
+        strategy:
+            fail-fast: false
+            matrix:
+                php:
+                    - "8.2"
+                    - "8.3"
+                    - "8.4"
+
+                symfony:
+                    - "~6.4.0"
+                    - "~7.4.0"
+
+        steps:
+            -   name: "Checkout"
+                uses: "actions/checkout@v5"
+
+            -   name: "Setup PHP, with composer and extensions"
+                uses: "shivammathur/setup-php@v2"
+                with:
+                    php-version: "${{ matrix.php }}"
+                    coverage: "none"
+                    tools: "flex"
+
+            -   name: "Install composer dependencies"
+                uses: "ramsey/composer-install@v3"
+                env:
+                    SYMFONY_REQUIRE: "${{ matrix.symfony }}"
+
+            -   name: "Validate composer"
+                run: "composer validate --strict"
+
+            -   name: "Check composer normalized"
+                run: "composer normalize --dry-run"

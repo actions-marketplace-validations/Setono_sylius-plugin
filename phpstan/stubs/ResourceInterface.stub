@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Sylius\Resource\Model;
+
+interface ResourceInterface
+{
+    /**
+     * @return int|string|null
+     */
+    public function getId();
+}
