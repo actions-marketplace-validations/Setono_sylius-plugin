@@ -22,6 +22,14 @@ inputs:
         description: "Symfony DATABASE_URL for the test application"
         required: false
         default: "mysql://root:root@127.0.0.1/sylius?serverVersion=8.0"
+    node-version:
+        description: "Node.js version to install for building the test application's assets"
+        required: false
+        default: "20"
+    testsuite:
+        description: "PHPUnit testsuite name to run after the integration setup. Empty (default) skips the phpunit step entirely."
+        required: false
+        default: ""
 
 runs:
     using: "composite"
@@ -38,11 +46,23 @@ runs:
                 coverage: "none"
                 tools: "flex"
 
+        -   uses: "actions/setup-node@v4"
+            with:
+                node-version: "${{ inputs.node-version }}"
+
         -   uses: "ramsey/composer-install@v4"
             env:
                 SYMFONY_REQUIRE: "${{ inputs.symfony }}"
             with:
                 dependency-versions: "${{ inputs.dependencies }}"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            run: "yarn install"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            run: "yarn build"
 
         -   shell: "bash"
             working-directory: "tests/Application"
@@ -71,3 +91,17 @@ runs:
                 APP_ENV: "test"
                 DATABASE_URL: "${{ inputs.database-url }}"
             run: "bin/console doctrine:schema:validate -vvv"
+
+        -   shell: "bash"
+            working-directory: "tests/Application"
+            env:
+                APP_ENV: "test"
+                DATABASE_URL: "${{ inputs.database-url }}"
+            run: "bin/console sylius:fixtures:load -n"
+
+        -   if: "inputs.testsuite != ''"
+            shell: "bash"
+            env:
+                APP_ENV: "test"
+                DATABASE_URL: "${{ inputs.database-url }}"
+            run: "vendor/bin/phpunit --testsuite=${{ inputs.testsuite }}"

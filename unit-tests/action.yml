@@ -18,6 +18,10 @@ inputs:
         description: "PHP extensions to install"
         required: false
         default: "intl, mbstring"
+    testsuite:
+        description: "PHPUnit testsuite name to run. Empty (default) runs all suites."
+        required: false
+        default: ""
 
 runs:
     using: "composite"
@@ -38,4 +42,4 @@ runs:
                 dependency-versions: "${{ inputs.dependencies }}"
 
         -   shell: "bash"
-            run: "vendor/bin/phpunit"
+            run: "vendor/bin/phpunit ${{ inputs.testsuite && format('--testsuite={0}', inputs.testsuite) || '' }}"

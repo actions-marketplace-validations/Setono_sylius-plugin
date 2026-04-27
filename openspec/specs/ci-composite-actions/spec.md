@@ -77,7 +77,7 @@ The Sylius removal step exists because Sylius's source code triggers analyser er
 
 ### Requirement: Unit tests sub-action runs PHPUnit
 
-The `unit-tests` sub-action SHALL install composer dependencies, then run `vendor/bin/phpunit`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, and `extensions`.
+The `unit-tests` sub-action SHALL install composer dependencies, then run `vendor/bin/phpunit`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, `extensions`, and `testsuite` (default empty). When `testsuite` is non-empty, it MUST be appended as `--testsuite=<value>`; when empty, no testsuite filter MUST be passed.
 
 #### Scenario: Action runs PHPUnit against installed dependencies
 
@@ -86,7 +86,7 @@ The `unit-tests` sub-action SHALL install composer dependencies, then run `vendo
 
 ### Requirement: Integration tests sub-action validates Doctrine schema against a live MySQL instance
 
-The `integration-tests` sub-action SHALL start the runner's pre-installed MySQL service, install composer dependencies, then run, in order: `bin/console lint:container`, `bin/console doctrine:database:create`, `bin/console doctrine:schema:create`, `bin/console doctrine:schema:validate -vvv` — each from `tests/Application`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, `extensions`, and `database-url` (default `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0`). The `database-url` input MUST be exposed as `DATABASE_URL` to each Doctrine command. `APP_ENV` MUST be set to `test` for each Doctrine command.
+The `integration-tests` sub-action SHALL start the runner's pre-installed MySQL service, install PHP, install Node.js, install composer dependencies, run `yarn install` and `yarn build` from `tests/Application`, then run, in order: `bin/console lint:container`, `bin/console doctrine:database:create`, `bin/console doctrine:schema:create`, `bin/console doctrine:schema:validate -vvv`, and `bin/console sylius:fixtures:load -n` — each from `tests/Application`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, `extensions`, `database-url` (default `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0`), `node-version` (default `20`), and `testsuite` (default empty). When `testsuite` is non-empty, the action MUST additionally run `vendor/bin/phpunit --testsuite=<value>` after fixtures load; when empty, no phpunit step MUST be invoked. The `database-url` input MUST be exposed as `DATABASE_URL` to each Doctrine, fixtures, and phpunit command. `APP_ENV` MUST be set to `test` for each Doctrine, fixtures, and phpunit command.
 
 #### Scenario: Schema validation runs against a real database
 
@@ -114,7 +114,7 @@ The `mutation-tests` sub-action SHALL install composer dependencies and run `inf
 
 ### Requirement: Code coverage sub-action runs phpunit with pcov and uploads to Codecov
 
-The `code-coverage` sub-action SHALL install composer dependencies, run `vendor/bin/phpunit --coverage-clover=.build/logs/clover.xml`, then upload the resulting clover file via `codecov/codecov-action@v5`. It SHALL accept inputs `php-version` (default `8.3`), `dependencies` (default `highest`), `extensions`, and `codecov-token` (required). PHP coverage driver MUST be `pcov`. The `codecov-token` input MUST be passed to the codecov action's `token` parameter.
+The `code-coverage` sub-action SHALL install composer dependencies, run `vendor/bin/phpunit --coverage-clover=.build/logs/clover.xml`, then upload the resulting clover file via `codecov/codecov-action@v5`. It SHALL accept inputs `php-version` (default `8.3`), `dependencies` (default `highest`), `extensions`, `codecov-token` (required), and `testsuite` (default empty). When `testsuite` is non-empty, it MUST be appended as `--testsuite=<value>`; when empty, no testsuite filter MUST be passed. PHP coverage driver MUST be `pcov`. The `codecov-token` input MUST be passed to the codecov action's `token` parameter.
 
 #### Scenario: Coverage is collected and uploaded
 

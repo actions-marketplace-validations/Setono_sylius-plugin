@@ -126,6 +126,7 @@ jobs:
 | `dependencies` | `highest` | Composer dependency versions: `lowest` or `highest` |
 | `symfony` | `""` | Symfony version constraint for Flex |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
+| `testsuite` | `""` | PHPUnit testsuite name to run. Empty runs all suites |
 
 ```yaml
 jobs:
@@ -154,8 +155,10 @@ jobs:
 | `symfony` | `""` | Symfony version constraint for Flex |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
 | `database-url` | `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0` | Symfony `DATABASE_URL` for the test application |
+| `node-version` | `20` | Node.js version for the `yarn install` / `yarn build` steps |
+| `testsuite` | `""` | PHPUnit testsuite name to run after the setup. Empty skips the phpunit step entirely |
 
-Starts the runner's pre-installed MySQL service, then runs `lint:container`, `doctrine:database:create`, `doctrine:schema:create`, and `doctrine:schema:validate -vvv` from `tests/Application`.
+Starts MySQL, installs PHP and Node, builds assets (`yarn install` + `yarn build`), then runs `lint:container`, `doctrine:database:create`, `doctrine:schema:create`, `doctrine:schema:validate -vvv`, and `sylius:fixtures:load -n` from `tests/Application`. If `testsuite` is set, finishes by running `vendor/bin/phpunit --testsuite=<value>`.
 
 ```yaml
 jobs:
@@ -202,6 +205,7 @@ jobs:
 | `dependencies` | `highest` | Composer dependency versions: `lowest` or `highest` |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
 | `codecov-token` | _(required)_ | Codecov upload token. Pass via secrets |
+| `testsuite` | `""` | PHPUnit testsuite name to run. Empty runs all suites |
 
 ```yaml
 jobs:
