@@ -28,7 +28,7 @@ inputs:
         required: false
         default: "intl, mbstring"
     database-url:
-        description: "DATABASE_URL for the integration tests"
+        description: "DATABASE_URL for the functional tests"
         required: false
         default: "mysql://root:root@127.0.0.1/sylius?serverVersion=8.0"
     codecov-token:
@@ -70,7 +70,7 @@ runs:
                 symfony: "${{ inputs.symfony }}"
                 extensions: "${{ inputs.extensions }}"
 
-        -   uses: "setono/sylius-plugin/integration-tests@v2"
+        -   uses: "setono/sylius-plugin/functional-tests@v2"
             with:
                 php-version: "${{ inputs.php-version }}"
                 dependencies: "${{ inputs.dependencies }}"

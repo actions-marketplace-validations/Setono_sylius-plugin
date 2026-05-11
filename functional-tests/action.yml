@@ -1,4 +1,4 @@
-name: "Integration tests"
+name: "Functional tests"
 description: "Validate Doctrine schema against a live MySQL instance from tests/Application"
 
 inputs:

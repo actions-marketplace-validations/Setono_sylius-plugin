@@ -23,7 +23,7 @@ Nine actions ship in this repository:
 | `setono/sylius-plugin/dependency-analysis@<ref>` | composer-dependency-analyser against production deps |
 | `setono/sylius-plugin/static-code-analysis@<ref>` | `vendor/bin/phpstan analyse`, with `sylius/sylius` removed first |
 | `setono/sylius-plugin/unit-tests@<ref>` | `vendor/bin/phpunit` |
-| `setono/sylius-plugin/integration-tests@<ref>` | MySQL + Doctrine schema validation against `tests/Application` |
+| `setono/sylius-plugin/functional-tests@<ref>` | MySQL + Doctrine schema validation against `tests/Application` |
 | `setono/sylius-plugin/mutation-tests@<ref>` | Infection, with optional Stryker Dashboard reporting |
 | `setono/sylius-plugin/code-coverage@<ref>` | PHPUnit with pcov, upload to Codecov |
 | `setono/sylius-plugin/backwards-compatibility@<ref>` | Roave backward-compatibility-check against the PR base ref |
@@ -36,7 +36,7 @@ The actions assume your plugin follows the standard Setono Sylius plugin scaffol
 
 - A test application at `tests/Application/` with `bin/console` available
 - Config files at the repo root: `ecs.php` (Easy Coding Standard), `phpstan.neon` / `phpstan.neon.dist` (PHPStan), and `phpunit.xml` / `phpunit.xml.dist` (PHPUnit)
-- For integration tests: `tests/Application/` runs in a Symfony `test` env and uses Doctrine with a MySQL-backed connection
+- For functional tests: `tests/Application/` runs in a Symfony `test` env and uses Doctrine with a MySQL-backed connection
 - For mutation tests: Infection is configured (typically via `infection.json5`)
 - For code coverage: PHPUnit is configured to write a clover report to `.build/logs/clover.xml`
 
@@ -146,7 +146,7 @@ jobs:
                     symfony: "${{ matrix.symfony }}"
 ```
 
-#### `integration-tests`
+#### `functional-tests`
 
 | Input | Default | Description |
 |---|---|---|
@@ -162,7 +162,7 @@ Starts MySQL, installs PHP and Node, builds assets (`yarn install` + `yarn build
 
 ```yaml
 jobs:
-    integration-tests:
+    functional-tests:
         runs-on: "ubuntu-latest"
         strategy:
             fail-fast: false
@@ -171,7 +171,7 @@ jobs:
                 dependencies: ["lowest", "highest"]
                 symfony: ["~6.4.0", "~7.4.0"]
         steps:
-            -   uses: "setono/sylius-plugin/integration-tests@v2"
+            -   uses: "setono/sylius-plugin/functional-tests@v2"
                 with:
                     php-version: "${{ matrix.php-version }}"
                     dependencies: "${{ matrix.dependencies }}"
@@ -252,7 +252,7 @@ The root action runs all seven sub-actions sequentially in a single job. **It is
 | `dependencies` | `highest` | Composer dependency versions: `lowest` or `highest` |
 | `symfony` | `~7.4.0` | Symfony version constraint for Flex |
 | `extensions` | `intl, mbstring` | PHP extensions to install |
-| `database-url` | `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0` | `DATABASE_URL` for integration tests |
+| `database-url` | `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0` | `DATABASE_URL` for functional tests |
 | `codecov-token` | `""` | Codecov upload token. Empty skips the code-coverage step entirely |
 | `stryker-dashboard-api-key` | `""` | Stryker Dashboard API key. Empty skips dashboard reporting (Infection still runs) |
 

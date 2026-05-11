@@ -12,7 +12,7 @@ The eight sub-actions are:
 - `dependency-analysis`
 - `static-code-analysis`
 - `unit-tests`
-- `integration-tests`
+- `functional-tests`
 - `mutation-tests`
 - `code-coverage`
 - `backwards-compatibility`
@@ -84,9 +84,9 @@ The `unit-tests` sub-action SHALL install composer dependencies, then run `vendo
 - **WHEN** the action is invoked
 - **THEN** `vendor/bin/phpunit` runs using the consumer's `phpunit.xml` (or `phpunit.xml.dist`) configuration
 
-### Requirement: Integration tests sub-action validates Doctrine schema against a live MySQL instance
+### Requirement: Functional tests sub-action validates Doctrine schema against a live MySQL instance
 
-The `integration-tests` sub-action SHALL start the runner's pre-installed MySQL service, install PHP, install Node.js, install composer dependencies, run `yarn install` and `yarn build` from `tests/Application`, then run, in order: `bin/console lint:container`, `bin/console doctrine:database:create`, `bin/console doctrine:schema:create`, `bin/console doctrine:schema:validate -vvv`, and `bin/console sylius:fixtures:load -n` — each from `tests/Application`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, `extensions`, `database-url` (default `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0`), `node-version` (default `20`), and `testsuite` (default empty). When `testsuite` is non-empty, the action MUST additionally run `vendor/bin/phpunit --testsuite=<value>` after fixtures load; when empty, no phpunit step MUST be invoked. The `database-url` input MUST be exposed as `DATABASE_URL` to each Doctrine, fixtures, and phpunit command. `APP_ENV` MUST be set to `test` for each Doctrine, fixtures, and phpunit command.
+The `functional-tests` sub-action SHALL start the runner's pre-installed MySQL service, install PHP, install Node.js, install composer dependencies, run `yarn install` and `yarn build` from `tests/Application`, then run, in order: `bin/console lint:container`, `bin/console doctrine:database:create`, `bin/console doctrine:schema:create`, `bin/console doctrine:schema:validate -vvv`, and `bin/console sylius:fixtures:load -n` — each from `tests/Application`. It SHALL accept inputs `php-version`, `dependencies`, `symfony`, `extensions`, `database-url` (default `mysql://root:root@127.0.0.1/sylius?serverVersion=8.0`), `node-version` (default `20`), and `testsuite` (default empty). When `testsuite` is non-empty, the action MUST additionally run `vendor/bin/phpunit --testsuite=<value>` after fixtures load; when empty, no phpunit step MUST be invoked. The `database-url` input MUST be exposed as `DATABASE_URL` to each Doctrine, fixtures, and phpunit command. `APP_ENV` MUST be set to `test` for each Doctrine, fixtures, and phpunit command.
 
 #### Scenario: Schema validation runs against a real database
 
