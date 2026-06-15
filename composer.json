@@ -16,7 +16,7 @@
         "phpstan/phpstan-phpunit": "^2.0.16",
         "phpstan/phpstan-strict-rules": "^2.0.10",
         "phpstan/phpstan-symfony": "^2.0.15",
-        "phpunit/phpunit": "^11.5.55",
+        "phpunit/phpunit": "^10.5.63 || ^11.5.55",
         "rector/rector": "^2.4.1",
         "shipmonk/composer-dependency-analyser": "^1.8.4",
         "sylius-labs/coding-standard": "^4.5"
