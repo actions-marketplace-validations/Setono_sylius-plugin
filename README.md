@@ -289,3 +289,5 @@ Equivalent manual commands (what `bin/release` runs):
 git tag -a 2.x.y -m "Release 2.x.y" && git push origin 2.x.y
 git tag -fa v2 -m "Update floating v2 tag to 2.x.y" && git push --force origin v2
 ```
+
+> **Packagist will email you about a "blocked update to version v2" after every release — this is expected and safe to ignore.** Packagist indexes the floating `v2` tag as an immutable stable version (`2`), so force-pushing `v2` trips Packagist's version-immutability guard and leaves that `2` version frozen at the previous commit. It's harmless: composer consumers depend on `^2.0`, which always resolves to the highest bare-numeric tag (e.g. `2.3.1`), never to the frozen `2`. **Do not** follow the email's suggestion to restore the `v2` tag to its previous commit — that would roll back the action consumers pinned to `@v2`.
